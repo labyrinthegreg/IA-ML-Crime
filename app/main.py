@@ -1,19 +1,16 @@
-from fastapi import FastAPI, HTTPException
-from app.pipeline import data_pipeline
+from fastapi import FastAPI
+import pandas as pd
+import pickle
 
 app = FastAPI()
 
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-CSV_PATH = "./data/train.csv"
+with open('pipeline_model.pkl', 'rb') as file:
+    model = pickle.load(file)
+print("Pipeline chargée avec succès.")
 
 @app.post("/predict/")
-async def predict(input_data: dict):
-    try:
-        result = data_pipeline(CSV_PATH, input_data)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def predict(input_data: dict):
+    input_df = pd.DataFrame([input_data])
+    prediction = model.predict(input_df)
+
+    return {"prediction": prediction[0]}
