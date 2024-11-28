@@ -10,11 +10,21 @@ const CrimePrediction: React.FC = () => {
   const [district, setDistrict] = useState<string>('');
   const [prediction, setPrediction] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const crimeTypes = ["Vol", "Agression", "Cambriolage", "Vandalisme", "Fraude"];
-    const randomPrediction = crimeTypes[Math.floor(Math.random() * crimeTypes.length)];
-    setPrediction(randomPrediction);
+    // Fetch the prediction from the API by post
+    const response = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ "Dates": date, "PdDistrict": district }),
+    });
+    const data = await response.json();
+    setPrediction(data.prediction);
+    // const randomPrediction = crimeTypes[Math.floor(Math.random() * crimeTypes.length)];
+    // setPrediction(randomPrediction);
   };
 
   return (
